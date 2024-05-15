@@ -14,11 +14,11 @@ export default async function page({searchParams}) {
    const currentPage = Number(searchParams?.page)||1;
    const totalPages = await fetchMedicinePages(query);
   return (
-    <>
+    <div className='container'>
     <Navbar></Navbar>
     <div className="w-full">
       <div className="flex w-full items-center justify-between">
-        <h1 className={`${lusitana.className} text-2xl`}>Medicine List</h1>
+        <h1 className={`${lusitana.className} text-3xl text-sky-500`}>Medicine List</h1>
       </div>
       <div className="mt-4 flex items-center justify-between gap-2 md:mt-8">
         <Search placeholder="Search Brand Name or Generic Name..." />
@@ -31,6 +31,6 @@ export default async function page({searchParams}) {
         <Pagination totalPages={totalPages} />
       </div>
     </div>
-    </>
+    </div>
   )
 }

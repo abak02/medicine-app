@@ -14,43 +14,7 @@ export default async function MedicineTable({
         <div className="mt-6 flow-root">
             <div className="inline-block min-w-full align-middle">
                 <div className="rounded-lg bg-gray-50 p-2 md:pt-2">
-                    {/* <div className="md:hidden">
-                        {medicines?.map((medicine) => (
-                            <div
-                                key={medicine.id}
-                                className="mb-2 w-full rounded-md bg-white p-4"
-                            >
-                                <div className="flex items-center justify-between border-b pb-4">
-                                    <div>
-                                        <div className="mb-2 flex items-center">
-                                            <Image
-                                                src={invoice.image_url}
-                                                className="mr-2 rounded-full"
-                                                width={28}
-                                                height={28}
-                                                alt={`${invoice.name}'s profile picture`}
-                                            />
-                                            <p className='text-xl font-medium'>{medicine.brandname}</p>
-                                        </div>
-                                        <p className="text-sm text-gray-500">{medicine.genericname}</p>
-                                    </div>
-                                    <InvoiceStatus status={invoice.status} />
-                                </div>
-                                <div className="flex w-full items-center justify-between pt-4">
-                                    <div>
-                                        <p className="text-green-500">
-                                            {medicine.nameofthemanufacturer}
-                                        </p>
-                                        <p className='font-medium'>{medicine.price}</p>
-                                    </div>
-                                    <div className="flex justify-end gap-2">
-                                        <UpdateInvoice id={invoice.id} />
-                                        <DeleteInvoice id={invoice.id} />
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
-                    </div> */}
+                    
 
                     <div className=" grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                         {medicines?.map((medicine) => (
@@ -60,17 +24,14 @@ export default async function MedicineTable({
                             >
                                 <div className="flex items-center justify-between border-b pb-4">
                                     <div>
-                                        <div className="mb-2 flex items-center">
-                                            {/* <Image
-              src={invoice.image_url}
-              className="mr-2 rounded-full"
-              width={28}
-              height={28}
-              alt={`${invoice.name}'s profile picture`}
-            /> */}
-                                            <p className='text-xl font-medium'>{medicine.brandname}</p>
+                                        <div className="mb-2 items-center">
+                                            
+                                             <p className='text-xl font-medium'>{medicine.brandname}</p>
+                                           
+                                            <p className='text-xs text-gray-500'>{medicine.dosagedescription}</p>
                                         </div>
-                                        <p className="text-sm text-gray-500">{medicine.genericname}</p>
+                                        
+                                        <p className="text-sm text-gray-700">{medicine.genericname}</p>
                                     </div>
                                     {/* <InvoiceStatus status={invoice.status} /> */}
                                 </div>
@@ -81,10 +42,6 @@ export default async function MedicineTable({
                                         </p>
                                         <p className='font-medium'>{medicine.price}</p>
                                     </div>
-                                    {/* <div className="flex justify-end gap-2">
-          <UpdateInvoice id={invoice.id} />
-          <DeleteInvoice id={invoice.id} />
-        </div> */}
                                 </div>
                             </div>
                         ))}
