@@ -1,3 +1,24 @@
+export const formatCurrency = (amount) => {
+  return (amount / 100).toLocaleString('en-US', {
+    style: 'currency',
+    currency: 'BDT', // Change currency to BDT for Bangladeshi Taka
+  });
+};
+
+export const formatDateToLocal = (
+  dateStr,
+  locale = 'en-US',
+) => {
+  const date = new Date(dateStr);
+  const options = Intl.DateTimeFormatOptions = {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  };
+  const formatter = new Intl.DateTimeFormat(locale, options);
+  return formatter.format(date);
+};
+
 export const generatePagination = (currentPage, totalPages) => {
     // If the total number of pages is 7 or less,
     // display all pages without any ellipsis.

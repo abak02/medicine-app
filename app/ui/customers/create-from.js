@@ -1,6 +1,8 @@
 import Link from "next/link"
 import '@/app/globals.css'
 import { createCustomer } from "@/app/lib/actions"
+
+
 export default async function Form() {
     return (
         <form action={createCustomer}>

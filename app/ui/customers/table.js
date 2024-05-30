@@ -2,6 +2,7 @@ import Image from 'next/image';
 import { lusitana } from '@/app/ui/fonts';
 import Search from '@/app/ui/search';
 import { fetchFilteredCustomers } from '@/app/lib/data';
+import { formatCurrency } from '@/app/lib/utils';
 
 
 export default async function CustomersTable({
@@ -40,11 +41,11 @@ export default async function CustomersTable({
                     <div className="flex w-full items-center justify-between border-b py-5">
                       <div className="flex w-1/2 flex-col">
                         <p className="text-xs">Pending</p>
-                        <p className="font-medium">{customer.total_pending}</p>
+                        <p className="font-medium text-red-500">BDT {customer.total_pending} </p>
                       </div>
                       <div className="flex w-1/2 flex-col">
                         <p className="text-xs">Paid</p>
-                        <p className="font-medium">{customer.total_paid}</p>
+                        <p className="font-medium text-green-500">BDT {customer.total_paid}</p>
                       </div>
                     </div>
                     <div className="pt-4 text-sm">
@@ -89,11 +90,11 @@ export default async function CustomersTable({
                       <td className="whitespace-nowrap bg-white px-4 py-5 text-sm">
                         {customer.total_invoices}
                       </td>
-                      <td className="whitespace-nowrap bg-white px-4 py-5 text-sm">
-                        {customer.total_pending}
+                      <td className="whitespace-nowrap text-red-500 bg-white px-4 py-5 text-sm">
+                        BDT {customer.total_pending}
                       </td>
-                      <td className="whitespace-nowrap bg-white px-4 py-5 text-sm group-first-of-type:rounded-md group-last-of-type:rounded-md">
-                        {customer.total_paid}
+                      <td className="whitespace-nowrap text-green-500 bg-white px-4 py-5 text-sm group-first-of-type:rounded-md group-last-of-type:rounded-md">
+                        BDT {customer.total_paid}
                       </td>
                     </tr>
                   ))}
