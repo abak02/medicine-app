@@ -23,9 +23,7 @@ export async function createCustomer(formData){
       });
     
     const customerId = uuidv4();
-    console.log(customerId);
-    console.log(customerName);
-    console.log(customerEmail);
+    
     try {await sql`
     INSERT INTO customers (id, name, email,image_url)
     VALUES (${customerId}, ${customerName}, ${customerEmail},'/janina')
@@ -44,8 +42,7 @@ export async function createInvoice(formData, selectedMedicines) {
       customerEmail: formData.get('customerEmail'),
       status: formData.get('status'),
   });
-  console.log(status);
-  console.log(customerName);
+  
   const invoiceId = uuidv4();
   const invoiceDate = new Date().toISOString();
   let customerId;
@@ -86,7 +83,7 @@ export async function createInvoice(formData, selectedMedicines) {
 
           await sql`
               INSERT INTO invoice_medicines (invoice_id, medicine_id, quantity, price_per_unit)
-              VALUES (${invoiceId}, ${id}, ${quantity}, ${pricePerUnit})
+              VALUES (${invoiceId}, ${id}, ${quantity}, ${pricePerUnit*100})
           `;
       }
 
@@ -100,3 +97,42 @@ export async function createInvoice(formData, selectedMedicines) {
   revalidatePath('/dashboard/invoices');
   redirect('/dashboard/invoices');
 }
+
+const UpdateStatusSchema = z.object({
+    status: z.string().nonempty("Status is required"),
+});
+
+
+export async function updateInvoice(id, formData) {
+   
+    const { status } = UpdateStatusSchema.parse({
+        status: formData.get('status'),
+    });
+
+    try {
+        await sql`
+            UPDATE invoices
+            SET status = ${status}
+            WHERE id = ${id}
+        `;
+    } catch (error) {
+        return {
+            message: 'Database Error: Failed to Update Invoice.'
+        };
+    }
+
+    revalidatePath('/dashboard/invoices');
+    redirect('/dashboard/invoices');
+}
+export async function deleteInvoice(id) {
+
+   
+    console.log(id);
+    try {await sql`DELETE FROM invoices WHERE id = ${id}`;}
+    catch(error){
+        return {
+            message : 'Database Error: Failed to Create Invoice.'
+        }
+    }
+    revalidatePath('/dashboard/invoices');
+  }

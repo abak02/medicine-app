@@ -57,7 +57,7 @@ export default function MedicineForm({ onAddMedicine }) {
         <>
             <p className={`${lusitana.className} text-lg mb-2`}>Medicine List</p>
 
-            <div className="flex gap-4 mb-4">
+            <div className=" gap-4 mb-4 md:flex">
                 <div className="relative flex-1">
                     <label htmlFor="medicineName" className="mb-2 block text-sm font-medium">
                         Medicine Name
@@ -133,6 +133,7 @@ export default function MedicineForm({ onAddMedicine }) {
                     </div>
                 </div>
             </div>
+            
 
             <AddButton onClick={handleAddMedicine}></AddButton>
             <div className="mt-4">
