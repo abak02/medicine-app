@@ -1,3 +1,5 @@
+import dayjs from 'dayjs';
+
 export const formatCurrency = (amount) => {
   return (amount / 100).toLocaleString('en-US', {
     style: 'currency',
@@ -72,3 +74,23 @@ export const generatePagination = (currentPage, totalPages) => {
     ];
   };
   
+  export const processData = (data) => {
+    const filteredData = data.filter(transaction => transaction.status === 'paid');
+    const monthlyData = {};
+  
+    filteredData.forEach(transaction => {
+      const date = dayjs(transaction.time, 'MMMM D, YYYY at h:mm:ss A');
+      const month = date.format('YYYY-MM');
+  
+      if (!monthlyData[month]) {
+        monthlyData[month] = 0;
+      }
+  
+      monthlyData[month] += transaction.amount;
+    });
+  
+    const labels = Object.keys(monthlyData);
+    const values = Object.values(monthlyData);
+  
+    return { labels, values };
+  };

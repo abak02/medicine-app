@@ -329,7 +329,8 @@ export async function fetchInvoiceById(id) {
         invoices.customer_id,
         invoices.amount,
         invoices.status,
-        invoices.date
+        invoices.date,
+        invoices.time
 
       FROM invoices
       WHERE invoices.id = ${id};
@@ -347,6 +348,34 @@ export async function fetchInvoiceById(id) {
     throw new Error('Failed to fetch invoice.');
   }
 }
+
+export async function fetchInvoices() {
+  noStore();
+  try {
+    const data = await sql`
+      SELECT
+        invoices.id,
+        invoices.customer_id,
+        invoices.amount,
+        invoices.status,
+        invoices.date,
+        invoices.time
+      FROM invoices;
+    `;
+
+    const invoices = data.rows.map((invoice) => ({
+      ...invoice,
+      // Convert amount from cents to dollars
+      amount: invoice.amount / 100,
+    }));
+
+    return invoices;
+  } catch (error) {
+    console.error('Database Error:', error);
+    throw new Error('Failed to fetch invoices.');
+  }
+}
+
 
 export async function fetchCustomerById(id) {
 

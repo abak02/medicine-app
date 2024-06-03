@@ -1,12 +1,20 @@
 import React from 'react'
 import { lusitana } from '@/app/ui/fonts'
 import Form from '@/app/ui/customers/create-from'
+import Breadcrumbs from '@/app/ui/customers/breadcrumbs'
 export default function page() {
     return (
         <>
-        <div className="flex w-full items-center justify-between">
-            <h1 className={`${lusitana.className} text-2xl`}>Create Customers</h1>
-        </div>
+        <Breadcrumbs
+        breadcrumbs={[
+          { label: 'Customers', href: '/dashboard/customers' },
+          {
+            label: 'Create Customer',
+            href: '/dashboard/customers/create',
+            active: true,
+          },
+        ]}
+      />
         <div>
             <Form></Form>
         </div>

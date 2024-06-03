@@ -14,6 +14,13 @@ const iconMap = {
   invoices: InboxIcon,
 };
 
+const colorMap = {
+  green: 'bg-green-50',
+  red: 'bg-red-50',
+  blue: 'bg-blue-50',
+  orange: 'bg-orange-50',
+};
+
 export default async function CardWrapper() {
   const {
     totalPaidInvoices,
@@ -23,15 +30,15 @@ export default async function CardWrapper() {
   } = await fetchCardData();
   return (
     <>
-      {/* NOTE: comment in this code when you get to this point in the course */}
 
-      <Card title="Collected" value={totalPaidInvoices} type="collected" />
-      <Card title="Pending" value={totalPendingInvoices} type="pending" />
-      <Card title="Total Invoices" value={numberOfInvoices} type="invoices" />
+      <Card title="Collected" value={totalPaidInvoices} type="collected" color="green" />
+      <Card title="Pending" value={totalPendingInvoices} type="pending" color="red"/>
+      <Card title="Total Invoices" value={numberOfInvoices} type="invoices" color="blue" />
       <Card
         title="Total Customers"
         value={numberOfCustomers}
         type="customers"
+        color = "orange"
       />
     </>
   );
@@ -41,11 +48,12 @@ export function Card({
   title,
   value,
   type,
+  color
 }) {
   const Icon = iconMap[type];
-
+  const Color = colorMap[color] || 'bg-gray-50';
   return (
-    <div className="rounded-xl bg-gray-50 p-2 shadow-sm">
+    <div className={`rounded-xl ${Color} p-2 shadow-sm`}>
       <div className="flex p-4">
         {Icon ? <Icon className="h-5 w-5 text-gray-700" /> : null}
         <h3 className="ml-2 text-sm font-medium">{title}</h3>

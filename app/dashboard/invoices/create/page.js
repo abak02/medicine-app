@@ -7,6 +7,7 @@ import { lusitana } from '@/app/ui/fonts';
 import Table from '@/app/ui/medicinelist/TableInvoice';
 import { InvoicesTableSkeleton } from '@/app/ui/skeletons';
 import { Suspense } from 'react';
+import Breadcrumbs from '@/app/ui/invoices/breadcrumbs';
 
 
 export default async function page({searchParams}) {
@@ -15,9 +16,17 @@ export default async function page({searchParams}) {
   const filteredMedicines = await fetchFilteredMedicineForSuggestion(query);
   return (
     <>
-      <div className="flex w-full items-center justify-between">
-        <h1 className={`${lusitana.className} text-2xl`}>Create Invoice</h1>
-      </div>
+    <Breadcrumbs
+        breadcrumbs={[
+          { label: 'Invoices', href: '/dashboard/invoices' },
+          {
+            label: 'Create Invoice',
+            href: '/dashboard/invoices/create',
+            active: true,
+          },
+        ]}
+      />
+      
       <div className=" w-full">
         
           <CreateInvoice filteredMedicines={filteredMedicines} />
