@@ -74,23 +74,46 @@ export const generatePagination = (currentPage, totalPages) => {
     ];
   };
   
-  export const processData = (data) => {
-    const filteredData = data.filter(transaction => transaction.status === 'paid');
-    const monthlyData = {};
-  
-    filteredData.forEach(transaction => {
-      const date = dayjs(transaction.time, 'MMMM D, YYYY at h:mm:ss A');
-      const month = date.format('YYYY-MM');
-  
-      if (!monthlyData[month]) {
-        monthlyData[month] = 0;
+
+
+
+import { parse } from 'date-fns';
+
+export function processInvoices(invoices) {
+  const monthlyRevenue = {};
+
+  invoices.forEach(invoice => {
+    const date = parse(invoice.date, "MMMM d, yyyy 'at' hh:mm:ss a", new Date());
+    if (!isNaN(date)) {
+      const month = date.toLocaleString('default', { month: 'short' });
+      const year = date.getFullYear();
+      const monthYear = `${month} ${year}`;
+
+      if (invoice.status === 'paid') {
+        if (!monthlyRevenue[monthYear]) {
+          monthlyRevenue[monthYear] = 0;
+        }
+        monthlyRevenue[monthYear] += invoice.amount;
       }
-  
-      monthlyData[month] += transaction.amount;
+    }
+  });
+
+  return Object.entries(monthlyRevenue)
+    .map(([month, revenue]) => ({ month, revenue }))
+    .sort((a, b) => {
+      const [monthA, yearA] = a.month.split(' ');
+      const [monthB, yearB] = b.month.split(' ');
+      const dateA = new Date(`${monthA} 1, ${yearA}`);
+      const dateB = new Date(`${monthB} 1, ${yearB}`);
+      return dateA - dateB;
     });
-  
-    const labels = Object.keys(monthlyData);
-    const values = Object.values(monthlyData);
-  
-    return { labels, values };
-  };
+}
+
+export function generateYAxis(revenue) {
+  const maxRevenue = Math.max(...revenue.map(r => r.revenue));
+  const steps = 5; // Number of steps on Y-axis
+  const increment = Math.ceil(maxRevenue / steps);
+  const yAxisLabels = Array.from({ length: steps + 1 }, (_, i) => (increment * i).toFixed(0)).reverse();
+
+  return { yAxisLabels, topLabel: increment * steps };
+}
