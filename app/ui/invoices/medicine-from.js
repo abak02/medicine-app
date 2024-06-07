@@ -114,7 +114,6 @@ export default function MedicineForm({ onAddMedicine }) {
                             placeholder="Enter quantity"
                             className="peer block w-full rounded-md border border-gray-200 py-2 pl-10 text-sm outline-2 placeholder:text-gray-500"
                             value={quantity}
-                            required
                             onChange={(e) => setQuantity(e.target.value)}
                         />
                     </div>

@@ -70,14 +70,15 @@ export async function createInvoice(formData, selectedMedicines) {
         const existingCustomer = await sql`
           SELECT id FROM customers WHERE email = ${customerEmail}
       `;
-        //console.log(existingCustomer);
-        if (existingCustomer) {
+     
+        if (existingCustomer?.rows[0]?.id) {
             // Use existing customer ID
             customerId = existingCustomer?.rows[0]?.id;
-            //console.log(customerId);
+            
         }
         else {
             // Insert new customer and get the new customer ID
+            
             customerId = uuidv4();
             await sql`
               INSERT INTO customers (id, name, email, image_url)
