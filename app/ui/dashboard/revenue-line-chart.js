@@ -11,7 +11,7 @@ import {
   Legend,
   Filler,
 } from 'chart.js';
-
+import { lusitana } from '../fonts';
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -63,6 +63,7 @@ export default function RevenueLineChart({ revenue }) {
         display: true,
         text: 'Monthly Revenue',
         font: {
+          family: `${lusitana.className}`,
           size: 18,
         },
         color: '#333',

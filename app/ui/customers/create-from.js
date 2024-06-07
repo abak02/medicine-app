@@ -1,6 +1,7 @@
 import Link from "next/link"
 import '@/app/globals.css'
 import { createCustomer } from "@/app/lib/actions"
+import { PlusIcon, XMarkIcon } from "@heroicons/react/24/outline"
 
 
 export default async function Form() {
@@ -42,9 +43,10 @@ export default async function Form() {
                         href="/dashboard/invoices"
                         className="flex h-10 items-center rounded-lg bg-gray-100 px-4 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-200"
                     >
+                        <XMarkIcon  className="h-5 w-5 mr-2 text-red-500" />
                        Cancel 
                     </Link>
-                    <button className="flex h-10 items-center rounded-lg bg-blue-500 px-4 text-sm font-medium text-white transition-colors hover:bg-blue-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500 active:bg-blue-600 aria-disabled:cursor-not-allowed aria-disabled:opacity-50'" type="submit">Create Customer</button>
+                    <button className="flex h-10 items-center rounded-lg bg-blue-500 px-4 text-sm font-medium text-white transition-colors hover:bg-blue-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500 active:bg-blue-600 aria-disabled:cursor-not-allowed aria-disabled:opacity-50'" type="submit"><PlusIcon className="h-5 w-5 mr-2" />Create Customer</button>
                 </div>
             </div>
 

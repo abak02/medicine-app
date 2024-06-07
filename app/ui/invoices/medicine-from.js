@@ -4,7 +4,7 @@ import { useDebouncedCallback } from 'use-debounce';
 import { lusitana } from '../fonts';
 import { fetchFilteredMedicineForSuggestion } from '@/app/lib/data';
 import AddButton from './addbutton';
-import { CheckIcon, CircleStackIcon, ClockIcon, CurrencyBangladeshiIcon, HashtagIcon } from '@heroicons/react/24/outline';
+import { CheckIcon, CircleStackIcon, ClockIcon, CurrencyBangladeshiIcon, HashtagIcon, TrashIcon } from '@heroicons/react/24/outline';
 
 export default function MedicineForm({ onAddMedicine }) {
     const [medicines, setMedicines] = useState([]);
@@ -48,6 +48,12 @@ export default function MedicineForm({ onAddMedicine }) {
         onAddMedicine(updatedMedicines);
     };
 
+    const handleDeleteMedicine = (index) => {
+        const updatedMedicines = addedMedicines.filter((_, i) => i !== index);
+        setAddedMedicines(updatedMedicines);
+        onAddMedicine(updatedMedicines);
+    };
+
     useEffect(() => {
         const total = addedMedicines.reduce((acc, medicine) => acc + parseFloat(medicine.totalPrice), 0);
         setTotalPrice(total.toFixed(2));
@@ -57,7 +63,7 @@ export default function MedicineForm({ onAddMedicine }) {
         <>
             <p className={`${lusitana.className} text-lg mb-2`}>Medicine List</p>
 
-            <div className=" gap-4 mb-4 md:flex">
+            <div className="gap-4 mb-4 md:flex">
                 <div className="relative flex-1">
                     <label htmlFor="medicineName" className="mb-2 block text-sm font-medium">
                         Medicine Name
@@ -108,6 +114,7 @@ export default function MedicineForm({ onAddMedicine }) {
                             placeholder="Enter quantity"
                             className="peer block w-full rounded-md border border-gray-200 py-2 pl-10 text-sm outline-2 placeholder:text-gray-500"
                             value={quantity}
+                            required
                             onChange={(e) => setQuantity(e.target.value)}
                         />
                     </div>
@@ -140,20 +147,24 @@ export default function MedicineForm({ onAddMedicine }) {
                 <h2 className={`${lusitana.className} text-lg mb-2`}>Added Medicines</h2>
                 <ul>
                     {addedMedicines.map((medicine, index) => (
-                        <li key={index} className="mb-2">
-                            <span>{medicine.medicineName} <span className='text-xs text-gray-500'>{medicine.type}</span></span>
-                            <span className="mx-2">-</span>
-                            <span>{medicine.quantity} pcs</span>
-                            <span className="mx-2">-</span>
-                            <span>{medicine.price}</span>
-                            <span className="mx-2">-</span>
-                            <span>{medicine.totalPrice} Tk</span>
+                        <li key={index} className="mb-2 flex justify-start items-center">
+                            <div>
+                                <span>{medicine.medicineName} <span className='text-xs text-gray-500'>{medicine.type}</span></span>
+                                <span className="mx-2">-</span>
+                                <span>{medicine.quantity} pcs</span>
+                                <span className="mx-2">-</span>
+                                <span>{medicine.price}</span>
+                                <span className="mx-2">-</span>
+                                <span>{medicine.totalPrice} Tk</span>
+                               
+                            </div>
+                            <TrashIcon className="h-5 ml-5 w-5 cursor-pointer text-red-500" onClick={() => handleDeleteMedicine(index)} />
                         </li>
                     ))}
                 </ul>
                 <hr className="my-4" />
                 <div className="flex justify-end">
-                    <span className="font-medium text-lg">Total Price: <span className='text-green-500'> {totalPrice} </span> Tk</span>
+                    <span className="font-medium text-lg">Total Price: <span className='text-green-500'>{totalPrice}</span> Tk</span>
                 </div>
                 {/* Invoice Status */}
                 <fieldset>

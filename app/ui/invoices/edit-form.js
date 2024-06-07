@@ -5,7 +5,9 @@ import {
   CheckIcon,
   ClockIcon,
   CurrencyDollarIcon,
+  PencilSquareIcon,
   UserCircleIcon,
+  XMarkIcon,
 } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 //import { Button } from '@/app/ui/button';
@@ -100,9 +102,11 @@ export default function EditInvoiceForm({
           href="/dashboard/invoices"
           className="flex h-10 items-center rounded-lg bg-gray-100 px-4 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-200"
         >
+          <XMarkIcon className="h-5 w-5 mr-2 text-red-500" />
           Cancel
         </Link>
         <button className="flex h-10 items-center rounded-lg bg-blue-500 px-4 text-sm font-medium text-white transition-colors hover:bg-blue-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500 active:bg-blue-600 aria-disabled:cursor-not-allowed aria-disabled:opacity-50" type="submit">
+        <PencilSquareIcon className="h-5 w-5 mr-2" />
                         Edit Invoice
                     </button>
       </div>

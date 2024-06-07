@@ -6,6 +6,8 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation'
 import { formatTimeToLocal } from './utils';
 const { v4: uuidv4 } = require('uuid');
+import { signIn } from '@/auth';
+import { AuthError } from 'next-auth';
 
 const FormSchema = z.object({
     id: z.string(),
@@ -158,7 +160,7 @@ export async function updateInvoice(id, formData) {
 export async function deleteInvoice(id) {
 
 
-    console.log(id);
+    //console.log(id);
     try { await sql`DELETE FROM invoices WHERE id = ${id}`; }
     catch (error) {
         return {
@@ -167,3 +169,22 @@ export async function deleteInvoice(id) {
     }
     revalidatePath('/dashboard/invoices');
 }
+
+export async function authenticate(
+    prevState,
+    formData,
+  ) {
+    try {
+      await signIn('credentials', formData);
+    } catch (error) {
+      if (error instanceof AuthError) {
+        switch (error.type) {
+          case 'CredentialsSignin':
+            return 'Invalid credentials.';
+          default:
+            return 'Something went wrong.';
+        }
+      }
+      throw error;
+    }
+  }
