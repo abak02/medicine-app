@@ -18,7 +18,8 @@ export default function Navbar() {
                     <li><Link href='#about'>About</Link></li>
                     </ul>
                 </div>
-                <a className="btn btn-ghost text-xl">Medicine App</a>
+                <Link href='/'><p className="btn btn-ghost text-xl">Medicine App</p></Link>
+                
             </div>
             <div className="navbar-center hidden lg:flex">
                 <ul className="menu menu-horizontal px-1 text-base">
@@ -31,7 +32,8 @@ export default function Navbar() {
                 </ul>
             </div>
             <div className="navbar-end">
-                <button type='button' className="leafbutton p-4 bg-sky-500 text-white py-4 px-9">Sign in</button>
+                <Link href='/login'><button type='button' className="leafbutton p-4 bg-sky-500 text-white py-4 px-9">Sign in</button></Link>
+                
             </div>
         </div>
     )

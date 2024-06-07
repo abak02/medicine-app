@@ -12,7 +12,6 @@ import Breadcrumbs from '@/app/ui/invoices/breadcrumbs';
 
 export default async function page({searchParams}) {
   const query = searchParams?.query;
-  //console.log(query);
   const filteredMedicines = await fetchFilteredMedicineForSuggestion(query);
   return (
     <>
