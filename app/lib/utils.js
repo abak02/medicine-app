@@ -7,18 +7,28 @@ export const formatCurrency = (amount) => {
   });
 };
 
-export const formatDateTimeToLocal = (dateStr, locale = 'en-US') => {
-  const date = new Date(dateStr);
-  return date.toLocaleString(locale, {
+export const formatPrintCurrency = (amount) => {
+  return (amount / 100).toLocaleString('en-US', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+};
+
+
+export function formatDateTimeToLocal(dateString) {
+  const date = new Date(dateString);
+  return date.toLocaleString('en-US', {
+    timeZone: 'Asia/Dhaka',  // Your local timezone
     year: 'numeric',
-    month: 'long',
+    month: 'short',
     day: 'numeric',
     hour: '2-digit',
     minute: '2-digit',
     second: '2-digit',
     hour12: true,
   });
-};
+}
+
 
 
 export const formatTimeToLocal = (

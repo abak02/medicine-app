@@ -5,12 +5,13 @@ import {
   CheckIcon,
   ClockIcon,
   PencilSquareIcon,
+  PrinterIcon,
   XMarkIcon,
 } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 //import { Button } from '@/app/ui/button';
 import { updateInvoice } from '@/app/lib/actions';
-import { formatCurrency, formatDateTimeToLocal} from '@/app/lib/utils';
+import { formatCurrency, formatDateTimeToLocal, formatPrintCurrency } from '@/app/lib/utils';
 import { lusitana } from '../fonts';
 
 
@@ -21,6 +22,7 @@ export default function EditInvoiceForm({
 }) {
   const updateInvoiceWithId = updateInvoice.bind(null, invoice.id);
   return (
+    <>
     <form action={updateInvoiceWithId} >
       <div className="rounded-md bg-gray-50 p-4 md:p-6 mb-4">
         {/* Customer Name */}
@@ -65,7 +67,7 @@ export default function EditInvoiceForm({
           <span className="font-medium text-lg">Discounted Total Price: <span className='text-green-500'> {formatCurrency(invoice.amount)}</span> Tk</span>
         </div>
         <div className="flex justify-end">
-          <span className="font-medium text-lg">Changed Amount: <span className='text-red-500'> {formatCurrency(invoice.given_amount-invoice.amount)}</span> Tk</span>
+          <span className="font-medium text-lg">Changed Amount: <span className='text-red-500'> {formatCurrency(invoice.given_amount - invoice.amount)}</span> Tk</span>
         </div>
       </div>
 
@@ -120,13 +122,69 @@ export default function EditInvoiceForm({
           <XMarkIcon className="h-5 w-5 mr-2 text-red-500" />
           Cancel
         </Link>
+        <button
+          type="button"
+          onClick={() => window.print()}
+          className="flex h-10 items-center rounded-lg bg-green-500 px-4 text-sm font-medium text-white transition-colors hover:bg-green-400"
+        > <PrinterIcon className='h-5 w-5 mr-2'/>
+          Print Receipt
+        </button>
         <button className="flex h-10 items-center rounded-lg bg-blue-500 px-4 text-sm font-medium text-white transition-colors hover:bg-blue-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500 active:bg-blue-600 aria-disabled:cursor-not-allowed aria-disabled:opacity-50" type="submit">
           <PencilSquareIcon className="h-5 w-5 mr-2" />
           Edit Invoice
         </button>
       </div>
     </form>
+    {/* Printable POS Receipt */}
+    
+      <div id="printable" className="hidden print:block p-4 px-6 text-sm font-mono">
+        <div className="text-center mb-4">
+          <h2 className="text-lg font-bold">Shamser Drug House</h2>
+          <p className='text-sm text-gray-500'>Collegemore, Kushtia</p>
+          <p>{formatDateTimeToLocal(invoice.date)}</p>
+          <hr className="my-2" />
+        </div>
+        <div className="mb-2">
+          <p className='text-xs'><strong>Invoice ID:</strong> {invoice.id}</p>
+          <p><strong>Customer:</strong> {customer.name}</p>
+          <p><strong>Phone:</strong> {customer.phone_no}</p>
+        </div>
+        <table className="w-full text-left border-collapse mb-2">
+          <thead>
+            <tr className="border-b border-gray-500">
+              <th className="pr-2 w-1/2">Item</th>
+              <th className="pr-2">Unit</th>
+              <th className="pr-2">Qty</th>
+              <th className="pr-2">Price</th>
+            </tr>
+          </thead>
+          <tbody>
+            {medicineList.map((medicine, idx) => (
+              <tr key={idx}>
+                <td>{medicine.brandname}</td>
+                <td>{formatPrintCurrency(medicine.price_per_unit)}</td>
+                <td>{medicine.quantity}</td>
+                <td>{formatPrintCurrency(medicine.quantity * medicine.price_per_unit)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <hr className="my-2" />
+        <div className="text-right">
+          <p><strong>Total:</strong> {formatCurrency(medicineList.reduce((sum, m) => sum + m.quantity * m.price_per_unit, 0))} Tk</p>
+          <p><strong>Discounted:</strong> {formatCurrency(invoice.amount)} Tk</p>
+          <p><strong>Paid:</strong> {formatCurrency(invoice.given_amount)} Tk</p>
+          <p><strong>Change:</strong> {formatCurrency(invoice.given_amount - invoice.amount)} Tk</p>
+        </div>
+        <div className="text-center mt-4">
+          <p>🎉 Thank you for your purchase!</p>
+        </div>
+      </div>
+    </>
+
   );
+  
+
 }
 
 

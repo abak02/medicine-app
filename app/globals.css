@@ -112,28 +112,40 @@ hr {
 
 @media print {
   body {
-    background: white;
-    color: black;
+    margin: 1.5rem;
+    padding: 1.5rem;
+    box-shadow: none;
+  }
+
+  #printable {
+    display: block !important;
+    width: 100%;
+    max-height: 100%;
     margin: 0;
-    padding: 0;
-    font-size: 12px;
-  }
-
-  .print\:hidden {
-    display: none !important;
-  }
-
-  .no-print {
-    display: none !important;
+    padding: 1.5rem;
+    page-break-after: avoid;
   }
 
   @page {
-    size: auto;
-    margin: 20mm;
+    margin: 0; /* Removes default browser margin on print */
+    size: auto; /* Let content decide the page size */
   }
 
-  html, body {
-    width: 100%;
-    height: auto !important;
+  /* Hide everything else except the printable area */
+  body * {
+    visibility: hidden;
+  }
+
+  #printable,
+  #printable * {
+    visibility: visible;
+  }
+
+  #printable {
+    position: absolute;
+    left: 0;
+    top: 0;
   }
 }
+
+
