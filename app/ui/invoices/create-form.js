@@ -7,7 +7,7 @@ import { lusitana } from '../fonts';
 
 import { createInvoice } from '@/app/lib/actions';
 import MedicineForm from './medicine-from';
-import { EnvelopeIcon, PlusIcon, UserCircleIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import { EnvelopeIcon, PhoneIcon, PlusIcon, UserCircleIcon, XMarkIcon } from '@heroicons/react/24/outline';
 
 export default function CreateInvoice() {
     const [customersList, setCustomers] = useState([]);
@@ -28,7 +28,7 @@ export default function CreateInvoice() {
 
     const handleSuggestionClick = (customer) => {
         setInputValue(customer.name);
-        setCustomerEmail(customer.email);
+        setCustomerEmail(customer.phone_no);
         setShowSuggestions(false);
     };
 
@@ -82,7 +82,7 @@ export default function CreateInvoice() {
                 </div>
                 <div className="mb-4">
                     <label htmlFor="customerEmail" className="mb-2 block text-sm font-medium">
-                        Customer Email
+                        Customer Phone No
                     </label>
                     <div className="relative mt-2 rounded-md">
                         <input
@@ -90,12 +90,13 @@ export default function CreateInvoice() {
                             id="customerEmail"
                             name="customerEmail"
                             autoComplete='off'
-                            placeholder="Enter customer Email"
+                            placeholder="Enter customer Phone No."
                             value={customerEmail}
                             onChange={(e) => setCustomerEmail(e.target.value)}
                             className="peer block w-full rounded-md border border-gray-200 py-2 pl-10 text-sm outline-2 placeholder:text-gray-500"
                         />
-                        <EnvelopeIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500" />
+                        <PhoneIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500" />
+
                         
                     </div>
                 </div>

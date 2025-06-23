@@ -86,7 +86,7 @@ export async function fetchCustomerPages(query) {
       SELECT COUNT(*) FROM customers
       WHERE
       name ILIKE ${`%${query}%`} OR
-      email ILIKE ${`%${query}%`} 
+      phone_no ILIKE ${`%${query}%`} 
     `;
     const totalPages = Math.ceil(Number(count.rows[0].count) / CUSTOMER_PER_PAGE);
     return totalPages;
@@ -123,12 +123,13 @@ export async function fetchCustomer(query) {
       SELECT
         id,
         name,
-       email
+       phone_no
       FROM customers
       WHERE
         name ILIKE ${`%${query}%`} OR
-      email ILIKE ${`%${query}%`}
+      phone_no ILIKE ${`%${query}%`}
       ORDER BY name ASC
+      Limit 10
     `;
 
     const customers = data.rows;
@@ -149,7 +150,7 @@ export async function fetchFilteredCustomers(query, currentPage) {
 		SELECT
 		  customers.id,
 		  customers.name,
-		  customers.email,
+		  customers.phone_no,
 		  COUNT(invoices.id) AS total_invoices,
 		  SUM(CASE WHEN invoices.status = 'pending' THEN invoices.amount ELSE 0 END) AS total_pending,
 		  SUM(CASE WHEN invoices.status = 'paid' THEN invoices.amount ELSE 0 END) AS total_paid
@@ -157,8 +158,8 @@ export async function fetchFilteredCustomers(query, currentPage) {
 		LEFT JOIN invoices ON customers.id = invoices.customer_id
 		WHERE
 		  customers.name ILIKE ${`%${query}%`} OR
-        customers.email ILIKE ${`%${query}%`}
-		GROUP BY customers.id, customers.name, customers.email, customers.image_url
+        customers.phone_no ILIKE ${`%${query}%`}
+		GROUP BY customers.id, customers.name, customers.phone_no, customers.image_url
 		ORDER BY customers.name ASC
     LIMIT ${CUSTOMER_PER_PAGE} OFFSET ${offset}
 	  `;
@@ -195,7 +196,7 @@ export async function fetchFilteredMedicineForSuggestion(
         brandname ILIKE ${`${query}%`}
         
       ORDER BY  brandname
-      LIMIT 40
+      LIMIT 20
     `;
 
     return invoices.rows;
@@ -213,7 +214,7 @@ export async function fetchInvoicesPages(query) {
     JOIN customers ON invoices.customer_id = customers.id
     WHERE
       customers.name ILIKE ${`%${query}%`} OR
-      customers.email ILIKE ${`%${query}%`} OR
+      customers.phone_no ILIKE ${`%${query}%`} OR
       invoices.amount::text ILIKE ${`%${query}%`} OR
       invoices.date::text ILIKE ${`%${query}%`} OR
       invoices.status ILIKE ${`%${query}%`}
@@ -238,24 +239,26 @@ export async function fetchFilteredInvoices(
 
   try {
     const invoices = await sql`
-      SELECT
-        invoices.id,
-        invoices.amount,
-        invoices.date,
-        invoices.status,
-        customers.name,
-        customers.email
-      FROM invoices
-      JOIN customers ON invoices.customer_id = customers.id
-      WHERE
-        customers.name ILIKE ${`%${query}%`} OR
-        customers.email ILIKE ${`%${query}%`} OR
-        invoices.amount::text ILIKE ${`%${query}%`} OR
-        invoices.date::text ILIKE ${`%${query}%`} OR
-        invoices.status ILIKE ${`%${query}%`}
-      ORDER BY invoices.date DESC
-      LIMIT ${INVOICES_PER_PAGE} OFFSET ${offset}
-    `;
+  SELECT
+    invoices.id,
+    invoices.amount,
+    invoices.date,
+    invoices.given_amount,
+    invoices.status,
+    customers.name,
+    customers.phone_no
+  FROM invoices
+  JOIN customers ON invoices.customer_id = customers.id
+  WHERE
+    customers.name ILIKE ${`%${query}%`} OR
+    customers.phone_no ILIKE ${`%${query}%`} OR
+    invoices.amount::text ILIKE ${`%${query}%`} OR
+    invoices.date::text ILIKE ${`%${query}%`} OR
+    invoices.status ILIKE ${`%${query}%`}
+    ORDER BY invoices.date DESC
+  LIMIT ${INVOICES_PER_PAGE} OFFSET ${offset}
+`;
+    ;
 
     return invoices.rows;
   } catch (error) {
@@ -268,7 +271,7 @@ export async function fetchLatestInvoices() {
   noStore();
   try {
     const data = await sql`
-      SELECT invoices.amount, customers.name, customers.image_url, customers.email, invoices.id
+      SELECT invoices.amount, invoices.date, customers.name, customers.phone_no, invoices.id
       FROM invoices
       JOIN customers ON invoices.customer_id = customers.id
       ORDER BY invoices.date DESC
@@ -330,7 +333,8 @@ export async function fetchInvoiceById(id) {
         invoices.amount,
         invoices.status,
         invoices.date,
-        invoices.time
+        invoices.time,
+        invoices.given_amount
 
       FROM invoices
       WHERE invoices.id = ${id};
@@ -339,7 +343,7 @@ export async function fetchInvoiceById(id) {
     const invoice = data.rows.map((invoice) => ({
       ...invoice,
       // Convert amount from cents to dollars
-      amount: invoice.amount / 100,
+      amount: invoice.amount,
     }));
 
     return invoice[0];
@@ -384,7 +388,7 @@ export async function fetchCustomerById(id) {
       SELECT
         id,
         name,
-        email
+        phone_no
       FROM customers
       
       where id = ${id}

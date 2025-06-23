@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { lusitana } from '@/app/ui/fonts';
 //import { LatestInvoice } from '@/app/lib/definitions';
 import { fetchLatestInvoices } from '@/app/lib/data';
+import { formatDateTimeToLocal } from '@/app/lib/utils';
 export default async function LatestInvoices() {
   const latestInvoices = await fetchLatestInvoices();
   return (
@@ -35,11 +36,15 @@ export default async function LatestInvoices() {
                     height={32}
                   /> */}
                   <div className="min-w-0">
+                    
                     <p className="truncate text-sm font-semibold md:text-base">
-                      {invoice.name}
+                      {invoice.name} <span className='text-gray-500 text-xs font-normal'>{invoice.phone_no}</span>
                     </p>
-                    <p className="hidden text-sm text-gray-500 sm:block">
-                      {invoice.email}
+                    {/* <p className="hidden text-sm text-gray-500 sm:block">
+                      {invoice.phone_no}
+                    </p> */}
+                    <p className="hidden text-xs text-gray-500 sm:block">
+                      Created on : {formatDateTimeToLocal(invoice.date)}
                     </p>
                   </div>
                 </div>

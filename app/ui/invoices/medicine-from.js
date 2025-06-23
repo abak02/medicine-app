@@ -5,6 +5,7 @@ import { lusitana } from '../fonts';
 import { fetchFilteredMedicineForSuggestion } from '@/app/lib/data';
 import AddButton from './addbutton';
 import { CheckIcon, CircleStackIcon, ClockIcon, CurrencyBangladeshiIcon, HashtagIcon, TrashIcon } from '@heroicons/react/24/outline';
+import { PencilIcon } from '@heroicons/react/24/outline';
 
 export default function MedicineForm({ onAddMedicine }) {
     const [medicines, setMedicines] = useState([]);
@@ -16,6 +17,11 @@ export default function MedicineForm({ onAddMedicine }) {
     const [addedMedicines, setAddedMedicines] = useState([]);
     const [totalPrice, setTotalPrice] = useState(0);
     const [id, setId] = useState('');
+    const [discount, setDiscount] = useState('');
+    const [discountedPrice, setDiscountedPrice] = useState(0);
+    const [givenAmount, setGivenAmount] = useState('');
+    const [changeAmount, setChangeAmount] = useState(0);
+
 
     const handleSearch = useDebouncedCallback(async (term) => {
         console.log(`Searching ${term}`);
@@ -54,10 +60,39 @@ export default function MedicineForm({ onAddMedicine }) {
         onAddMedicine(updatedMedicines);
     };
 
+    const handleEditMedicine = (index) => {
+        const medicineToEdit = addedMedicines[index];
+
+        // Remove from list
+        const updatedMedicines = addedMedicines.filter((_, i) => i !== index);
+        setAddedMedicines(updatedMedicines);
+        onAddMedicine(updatedMedicines);
+
+        // Pre-fill input fields
+        setMedicineName(medicineToEdit.medicineName);
+        setQuantity(medicineToEdit.quantity);
+        setPrice(medicineToEdit.price);
+        setType(medicineToEdit.type);
+        setId(medicineToEdit.id);
+    };
+
+
     useEffect(() => {
-        const total = addedMedicines.reduce((acc, medicine) => acc + parseFloat(medicine.totalPrice), 0);
+        const total = addedMedicines.reduce(
+            (acc, medicine) => acc + parseFloat(medicine.totalPrice),
+            0
+        );
         setTotalPrice(total.toFixed(2));
-    }, [addedMedicines]);
+
+        const discountAmount = discount ? (total * parseFloat(discount)) / 100 : 0;
+        const discounted = Math.round(total - discountAmount);
+        setDiscountedPrice(discounted.toFixed(2));
+
+        // Calculate change amount whenever givenAmount or discountedPrice changes
+        const given = parseFloat(givenAmount) || 0;
+        setChangeAmount((given - discounted).toFixed(2));
+    }, [addedMedicines, discount, givenAmount]);
+
 
     return (
         <>
@@ -139,7 +174,7 @@ export default function MedicineForm({ onAddMedicine }) {
                     </div>
                 </div>
             </div>
-            
+
 
             <AddButton onClick={handleAddMedicine}></AddButton>
             <div className="mt-4">
@@ -155,16 +190,80 @@ export default function MedicineForm({ onAddMedicine }) {
                                 <span>{medicine.price}</span>
                                 <span className="mx-2">-</span>
                                 <span>{medicine.totalPrice} Tk</span>
-                               
+
                             </div>
-                            <TrashIcon className="h-5 ml-5 w-5 cursor-pointer text-red-500" onClick={() => handleDeleteMedicine(index)} />
+                            <div className="flex items-center ml-5 gap-2">
+                                <PencilIcon
+                                    className="h-5 w-5 text-blue-500 cursor-pointer"
+                                    onClick={() => handleEditMedicine(index)}
+                                />
+                                <TrashIcon
+                                    className="h-5 w-5 text-red-500 cursor-pointer"
+                                    onClick={() => handleDeleteMedicine(index)}
+                                />
+                            </div>
+
                         </li>
                     ))}
                 </ul>
                 <hr className="my-4" />
                 <div className="flex justify-end">
-                    <span className="font-medium text-lg">Total Price: <span className='text-green-500'>{totalPrice}</span> Tk</span>
+                    <span className="font-medium text-md">Total Price: <span className='text-blue-500'>{totalPrice}</span> Tk</span>
                 </div>
+                <div className="mt-4 flex justify-end flex-col md:flex-row items-center gap-4">
+                    <label htmlFor="discount" className="text-sm font-medium">
+                        Discount (%):
+                    </label>
+                    <input
+                        type="number"
+                        id="discount"
+                        name="discount"
+                        placeholder="e.g., 10"
+                        value={discount}
+                        onChange={(e) => {
+                            let val = e.target.value;
+                            if (val === '') {
+                                setDiscount('');
+                                return;
+                            }
+                            val = Math.min(Math.max(Number(val), 0), 10);
+                            setDiscount(val.toString());
+                        }}
+                        className="w-24 rounded-md border border-gray-200 py-1.5 px-2 text-sm"
+                        min="0"
+                        max="100"
+                    />
+                </div>
+                <div className="flex flex-col items-end text-right space-y-1 mt-4">
+                    {discount && (
+                        <span className="font-medium text-base">
+                            Discounted Price: <span className="text-green-600">{discountedPrice}</span> Tk
+                        </span>
+                    )}
+                </div>
+                <div className="mt-4 flex justify-end flex-col md:flex-row items-center gap-4">
+                    <label htmlFor="givenAmount" className="mb-2 block text-sm font-medium">
+                        Given Amount (Tk):
+                    </label>
+                    <input
+                        type="number"
+                        id="givenAmount"
+                        name="givenAmount"
+                        min="0"
+                        step="1"
+                        placeholder="Enter given amount"
+                        value={givenAmount}
+                        onChange={(e) => setGivenAmount(e.target.value)}
+                        className="peer block w-32 rounded-md border border-gray-200 py-2 px-3 text-sm outline-2 placeholder:text-gray-500"
+                    />
+                </div>
+
+                <div className="mt-4 flex justify-end font-medium text-md">
+                    <span>
+                        Change Amount: <span className="text-red-600">{changeAmount >= 0 ? changeAmount : '0.00'}</span> Tk
+                    </span>
+                </div>
+
                 {/* Invoice Status */}
                 <fieldset>
                     <legend className="mb-2 block text-sm font-medium">

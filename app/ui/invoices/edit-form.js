@@ -4,15 +4,13 @@
 import {
   CheckIcon,
   ClockIcon,
-  CurrencyDollarIcon,
   PencilSquareIcon,
-  UserCircleIcon,
   XMarkIcon,
 } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 //import { Button } from '@/app/ui/button';
 import { updateInvoice } from '@/app/lib/actions';
-import { formatCurrency, formatDateToLocal, formatTimeToLocal } from '@/app/lib/utils';
+import { formatCurrency, formatDateTimeToLocal} from '@/app/lib/utils';
 import { lusitana } from '../fonts';
 
 
@@ -28,33 +26,50 @@ export default function EditInvoiceForm({
         {/* Customer Name */}
         <div className="mb-4">
           <h6><span className='font-bold'>Customer Name :</span>  {customer.name}</h6>
-          <h6> <span className='font-bold'>Customer Email :</span>  {customer.email}</h6>
-          <h6><span className="font-bold">Invoice Date : </span> {(invoice.date)} </h6>
-          <h6><span className="font-bold">Last Update : </span> {invoice.time} </h6>
+          <h6> <span className='font-bold'>Customer Phone No. :</span>  {customer.phone_no}</h6>
+          <h6><span className="font-bold">Invoice Date : </span> {formatDateTimeToLocal(invoice.date)} </h6>
+          <h6><span className="font-bold">Last Update : </span> {formatDateTimeToLocal(invoice.time)} </h6>
         </div>
       </div>
       <div className="rounded-md bg-gray-50 p-4 md:p-6 mb-4">
         <h2 className={`${lusitana.className} text-lg mb-2 text-blue-500`}>Purchased Medicines</h2>
-                <ul>
-                    {medicineList.map((medicine, index) => (
-                        <li key={index} className="mb-2">
-                            <span>{medicine.brandname} <span className='text-xs text-gray-500'>{medicine.dosagedescription}</span></span>
-                            <span className="mx-2">-</span>
-                            <span>{medicine.quantity} pcs</span>
-                            <span className="mx-2">-</span>
-                            <span>{formatCurrency(medicine.price_per_unit)}</span>
-                            <span className="mx-2">-</span>
-                            <span>{formatCurrency(medicine.quantity * medicine.price_per_unit)} Tk</span>
-                        </li>
-                    ))}
-                </ul>
-                <hr className="my-4" />
-                <div className="flex justify-end">
-                    <span className="font-medium text-lg">Total Price: <span className='text-green-500'> {invoice.amount} </span> Tk</span>
-                </div>
-                    </div>
-       
-        <div className="rounded-md bg-gray-50 p-4 md:p-6">
+        <ul>
+          {medicineList.map((medicine, index) => (
+            <li key={index} className="mb-2">
+              <span>{medicine.brandname} <span className='text-xs text-gray-500'>{medicine.dosagedescription}</span></span>
+              <span className="mx-2">-</span>
+              <span>{medicine.quantity} pcs</span>
+              <span className="mx-2">-</span>
+              <span>{formatCurrency(medicine.price_per_unit)}</span>
+              <span className="mx-2">-</span>
+              <span>{formatCurrency(medicine.quantity * medicine.price_per_unit)} Tk</span>
+            </li>
+          ))}
+        </ul>
+        <hr className="my-4" />
+        <div className="flex justify-end">
+          <span className="font-medium text-md">
+            Total Price:{' '}
+            <span className="text-gray-700">
+              {formatCurrency(
+                medicineList.reduce(
+                  (sum, medicine) => sum + medicine.quantity * medicine.price_per_unit,
+                  0
+                )
+              )}{' '}
+              Tk
+            </span>
+          </span>
+        </div>
+        <div className="flex justify-end">
+          <span className="font-medium text-lg">Discounted Total Price: <span className='text-green-500'> {formatCurrency(invoice.amount)}</span> Tk</span>
+        </div>
+        <div className="flex justify-end">
+          <span className="font-medium text-lg">Changed Amount: <span className='text-red-500'> {formatCurrency(invoice.given_amount-invoice.amount)}</span> Tk</span>
+        </div>
+      </div>
+
+      <div className="rounded-md bg-gray-50 p-4 md:p-6">
         <fieldset>
           <legend className="mb-2 block text-sm font-medium">
             Set the invoice status
@@ -106,10 +121,19 @@ export default function EditInvoiceForm({
           Cancel
         </Link>
         <button className="flex h-10 items-center rounded-lg bg-blue-500 px-4 text-sm font-medium text-white transition-colors hover:bg-blue-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500 active:bg-blue-600 aria-disabled:cursor-not-allowed aria-disabled:opacity-50" type="submit">
-        <PencilSquareIcon className="h-5 w-5 mr-2" />
-                        Edit Invoice
-                    </button>
+          <PencilSquareIcon className="h-5 w-5 mr-2" />
+          Edit Invoice
+        </button>
       </div>
     </form>
   );
 }
+
+
+
+
+
+
+
+
+

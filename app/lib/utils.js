@@ -7,19 +7,19 @@ export const formatCurrency = (amount) => {
   });
 };
 
-export const formatDateToLocal = (
-  dateStr,
-  locale = 'en-US',
-) => {
+export const formatDateTimeToLocal = (dateStr, locale = 'en-US') => {
   const date = new Date(dateStr);
-  const options = Intl.DateTimeFormatOptions = {
-    day: 'numeric',
-    month: 'short',
+  return date.toLocaleString(locale, {
     year: 'numeric',
-  };
-  const formatter = new Intl.DateTimeFormat(locale, options);
-  return formatter.format(date);
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: true,
+  });
 };
+
 
 export const formatTimeToLocal = (
   dateStr,
@@ -77,37 +77,49 @@ export const generatePagination = (currentPage, totalPages) => {
 
 
 
-import { parse } from 'date-fns';
-
 export function processInvoices(invoices) {
-  const monthlyRevenue = {};
+  const revenueMap = {};
+  let latestDate = null;
 
   invoices.forEach(invoice => {
-    const date = parse(invoice.date, "MMMM d, yyyy 'at' hh:mm:ss a", new Date());
-    if (!isNaN(date)) {
-      const month = date.toLocaleString('default', { month: 'short' });
-      const year = date.getFullYear();
-      const monthYear = `${month} ${year}`;
+    const date = new Date(invoice.date); // ✅ ISO format — safe to use directly
+    if (isNaN(date)) return;
 
-      if (invoice.status === 'paid') {
-        if (!monthlyRevenue[monthYear]) {
-          monthlyRevenue[monthYear] = 0;
-        }
-        monthlyRevenue[monthYear] += invoice.amount;
+    // Update latest invoice date
+    if (!latestDate || date > latestDate) {
+      latestDate = date;
+    }
+
+    const year = date.getFullYear();
+    const month = date.getMonth(); // 0-based
+    const key = `${year}-${String(month + 1).padStart(2, '0')}`;
+
+    if (invoice.status === 'paid') {
+      if (!revenueMap[key]) {
+        revenueMap[key] = 0;
       }
+      revenueMap[key] += invoice.amount;
     }
   });
 
-  return Object.entries(monthlyRevenue)
-    .map(([month, revenue]) => ({ month, revenue }))
-    .sort((a, b) => {
-      const [monthA, yearA] = a.month.split(' ');
-      const [monthB, yearB] = b.month.split(' ');
-      const dateA = new Date(`${monthA} 1, ${yearA}`);
-      const dateB = new Date(`${monthB} 1, ${yearB}`);
-      return dateA - dateB;
+  if (!latestDate) return []; // No valid data
+
+  // Generate last 6 months keys
+  const result = [];
+  for (let i = 5; i >= 0; i--) {
+    const date = new Date(latestDate.getFullYear(), latestDate.getMonth() - i);
+    const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+    const label = date.toLocaleString('default', { month: 'short', year: 'numeric' }); // e.g., "Feb 2025"
+    result.push({
+      month: label,
+      revenue: revenueMap[key] || 0,
     });
+  }
+
+  return result;
 }
+
+
 
 export function generateYAxis(revenue) {
   const maxRevenue = Math.max(...revenue.map(r => r.revenue));
