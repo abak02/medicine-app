@@ -219,19 +219,29 @@ export default function MedicineForm({ onAddMedicine }) {
                         id="discount"
                         name="discount"
                         placeholder="e.g., 10"
+                        step="0.01"
                         value={discount}
                         onChange={(e) => {
                             let val = e.target.value;
+
+                            // Allow empty input
                             if (val === '') {
                                 setDiscount('');
                                 return;
                             }
-                            val = Math.min(Math.max(Number(val), 0), 10);
-                            setDiscount(val.toString());
+
+                            // Allow only numeric input (with optional decimal)
+                            const num = parseFloat(val);
+                            if (!isNaN(num)) {
+                                // Clamp between 0 and 10
+                                const clamped = Math.min(Math.max(num, 0), 10);
+                                setDiscount(clamped.toString());
+                            }
                         }}
+
                         className="w-24 rounded-md border border-gray-200 py-1.5 px-2 text-sm"
                         min="0"
-                        max="100"
+                        max="10"
                     />
                 </div>
                 <div className="flex flex-col items-end text-right space-y-1 mt-4">

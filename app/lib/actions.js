@@ -55,7 +55,6 @@ export async function createInvoice(formData, selectedMedicines) {
     const discountPercentNum = parseFloat(discountPercentage) || 0;
     const givenAmountNum = parseFloat(givenAmount) || 0;
 
-    console.log(discountPercentNum, givenAmountNum);
 
     const invoiceId = uuidv4();
     const locale = 'en-US';
@@ -97,14 +96,14 @@ export async function createInvoice(formData, selectedMedicines) {
 
         // Calculate total amount of the invoice
         const total = selectedMedicines.reduce((acc, medicine) => acc + parseFloat(medicine.totalPrice), 0);
-        const discountedAmount = total * (discountPercentNum / 100);
+        const discountedAmount = Math.round(total * (discountPercentNum / 100));
 
         // Calculate final amount after discount
-        const finalAmount = total - discountedAmount;
+        const finalAmount = Math.round(total - discountedAmount);
         // Insert invoice details
         await sql`
       INSERT INTO invoices (id, customer_id, date, amount, status, time, discounted_amount, given_amount)
-      VALUES (${invoiceId}, ${customerId}, ${formattedDateTime}, ${Math.round(finalAmount * 100)}, ${status}, ${formattedDateTime}, ${Math.round(discountedAmount * 100)}, ${Math.round(givenAmountNum * 100)})
+      VALUES (${invoiceId}, ${customerId}, ${formattedDateTime}, ${finalAmount * 100}, ${status}, ${formattedDateTime}, ${discountedAmount * 100}, ${givenAmountNum * 100})
     `;
 
         // Iterate through selected medicines and insert into invoice_medicines table
