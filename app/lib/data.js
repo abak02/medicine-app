@@ -159,7 +159,7 @@ export async function fetchFilteredCustomers(query, currentPage) {
 		WHERE
 		  customers.name ILIKE ${`%${query}%`} OR
         customers.phone_no ILIKE ${`%${query}%`}
-		GROUP BY customers.id, customers.name, customers.phone_no, customers.image_url
+		GROUP BY customers.id, customers.name, customers.phone_no
 		ORDER BY customers.name ASC
     LIMIT ${CUSTOMER_PER_PAGE} OFFSET ${offset}
 	  `;
