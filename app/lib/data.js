@@ -495,6 +495,7 @@ WHERE
   }
 }
 
+
 const SHOP_PER_PAGE = 40;
 
 // Fetch total pages for Shop table
@@ -563,3 +564,4 @@ export async function fetchShopMedicinesById(id) {
     throw new Error('Failed to fetch shop medicine.');
   }
 }
+
