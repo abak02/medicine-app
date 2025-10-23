@@ -210,11 +210,12 @@ export default function MedicineForm({ onAddMedicine }) {
                 <div className="flex justify-end">
                     <span className="font-medium text-md">Total Price: <span className='text-blue-500'>{totalPrice}</span> Tk</span>
                 </div>
-                <div className="mt-4 flex justify-end flex-col md:flex-row items-center gap-4">
+                <div className="mt-4 flex justify-end items-center gap-4">
                     <label htmlFor="discount" className="text-sm font-medium">
                         Discount (%):
                     </label>
-                    <input
+                    <div className="relative rounded-md">
+                        <input
                         type="number"
                         id="discount"
                         name="discount"
@@ -243,6 +244,8 @@ export default function MedicineForm({ onAddMedicine }) {
                         min="0"
                         max="10"
                     />
+                    </div>
+                    
                 </div>
                 <div className="flex flex-col items-end text-right space-y-1 mt-4">
                     {discount && (
@@ -251,7 +254,7 @@ export default function MedicineForm({ onAddMedicine }) {
                         </span>
                     )}
                 </div>
-                <div className="mt-4 flex justify-end flex-col md:flex-row items-center gap-4">
+                <div className="mt-4 flex justify-end items-center gap-4">
                     <label htmlFor="givenAmount" className="mb-2 block text-sm font-medium">
                         Given Amount (Tk):
                     </label>
@@ -269,7 +272,7 @@ export default function MedicineForm({ onAddMedicine }) {
                 </div>
 
                 <div className="mt-4 flex justify-end font-medium text-md">
-                    <span>
+                    <span className='mb-4'>
                         Change Amount: <span className="text-red-600">{changeAmount >= 0 ? changeAmount : '0.00'}</span> Tk
                     </span>
                 </div>

@@ -4,15 +4,15 @@ import Pagination from '@/app/ui/medicinelist/pagination';
 import Search from '@/app/ui/search';
 import { lusitana } from '@/app/ui/fonts';
 import Table from '@/app/ui/medicinelist/Table';
-import { InvoicesTableSkeleton,CardsSkeleton } from '@/app/ui/skeletons';
+import { CardsSkeleton } from '@/app/ui/skeletons';
 import { Suspense } from 'react';
-import { fetchMedicinePages } from '@/app/lib/data';
+import { fetchShopPages } from '@/app/lib/data';
 export default async function page({searchParams}) {
     //const medicineData = await fetchMedicine();
    // console.log(medicineData);
    const query = searchParams?.query||'';
    const currentPage = Number(searchParams?.page)||1;
-   const totalPages = await fetchMedicinePages(query);
+   const totalPages = await fetchShopPages(query);
   return (
     <div >
     
@@ -21,7 +21,8 @@ export default async function page({searchParams}) {
         <h1 className={`${lusitana.className} text-3xl text-sky-500`}>Medicine List</h1>
       </div>
       <div className="mt-4 flex items-center justify-between gap-2 md:mt-8">
-        <Search placeholder="Search Brand Name or Generic Name..." />
+        <Search placeholder="Search Brand Name ..." />
+        <Search placeholder="Search Generic Name ..."/>
         {/* <CreateInvoice /> */}
       </div>
        <Suspense key={query + currentPage} fallback={<CardsSkeleton />}>

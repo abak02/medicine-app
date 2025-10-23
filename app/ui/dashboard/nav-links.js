@@ -4,6 +4,7 @@ import {
   HomeIcon,
   DocumentDuplicateIcon,
   ListBulletIcon,
+  BuildingStorefrontIcon
 } from '@heroicons/react/24/outline';
 
 import Link from 'next/link';
@@ -19,6 +20,7 @@ const links = [
     icon: DocumentDuplicateIcon,
   },
   { name: 'Customers', href: '/dashboard/customers', icon: UserGroupIcon },
+  {name: 'My Shop', href: '/dashboard/myshop', icon: BuildingStorefrontIcon },
   { name: 'Medicine List', href: '/dashboard/medicineList', icon: ListBulletIcon },
 ];
 

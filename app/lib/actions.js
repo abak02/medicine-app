@@ -266,3 +266,125 @@ export async function authenticate(
         throw error;
     }
 }
+
+export async function deleteShopMedicine(id) {
+    console.log('Deleting medicine with id:', id);
+    try { await sql`DELETE FROM shopinventory WHERE medicine_id = ${id}::uuid`; }
+    catch (error) {
+        return {
+            message: 'Database Error: Failed to delete medicine.'
+        }
+    }
+    revalidatePath('/dashboard/myshop');
+    
+}
+
+
+const AddMedicineSchema = z.object({
+  id: z.string(),         // medicine ID (UUID)
+  quantity: z.number(),   // quantity to add
+  price: z.string(),      // price per unit
+});
+
+// Add medicine to shop inventory and update price
+export async function addMedicineToShop({ id, quantity, price }) {
+  const { id: medicineId, quantity: qty, price: priceStr } = AddMedicineSchema.parse({
+    id,
+    quantity,
+    price
+  });
+
+  try {
+    const numericPrice = parseFloat(priceStr.replace(/[^\d.-]/g, ''));
+
+    // Check if medicine exists in shop inventory
+    const existing = await sql`
+      SELECT quantity
+      FROM shopinventory
+      WHERE medicine_id = ${medicineId}::uuid;
+    `;
+
+    if (existing.rows.length > 0) {
+      // Medicine exists → update quantity
+      const newQuantity = existing.rows[0].quantity + qty;
+      await sql`
+        UPDATE shopinventory
+        SET quantity = ${newQuantity}
+        WHERE medicine_id = ${medicineId}::uuid;
+      `;
+    } else {
+      // Insert new medicine in shop inventory
+      await sql`
+        INSERT INTO shopinventory (medicine_id, quantity)
+        VALUES (${medicineId}::uuid, ${qty});
+      `;
+    }
+
+    // Update price in medicinelist
+    await sql`
+      UPDATE medicinelist
+      SET price = ${numericPrice * 100}
+      WHERE id = ${medicineId}::uuid;
+    `;
+
+  } catch (error) {
+    console.error('Database Error (addMedicineToShop):', error);
+    throw new Error('Failed to add medicine to shop inventory.');
+  }
+
+  // Revalidate the shop page
+  revalidatePath('/dashboard/myshop');
+}
+
+const EditMedicineSchema = z.object({
+  id: z.string(),          // medicine ID (UUID)
+  quantity: z.number(),    // quantity to add
+  price: z.string(),       // new price per unit
+});
+
+// Edit existing medicine info in shop inventory
+export async function editShopMedicine({ id, quantity, price }) {
+  try {
+    const numericPrice = parseFloat(price.toString().replace(/[^\d.-]/g, ''));
+    const qty = Number(quantity);
+
+    // Get current quantity
+    const existing = await sql`
+      SELECT quantity
+      FROM shopinventory
+      WHERE medicine_id = ${id}::uuid;
+    `;
+
+    if (existing.rows.length === 0) {
+      throw new Error('Medicine not found in inventory.');
+    }
+
+    const currentQuantity = existing.rows[0].quantity;
+
+    // --- 🧠 Smart Logic ---
+    if (qty > 0) {
+      // Case 2: Add to existing quantity
+      const newQuantity = currentQuantity + qty;
+      await sql`
+        UPDATE shopinventory
+        SET quantity = ${newQuantity}
+        WHERE medicine_id = ${id}::uuid;
+      `;
+    }
+    // If qty = 0 → skip quantity update
+
+    // Always update price (case 1 or 2)
+    await sql`
+      UPDATE medicinelist
+      SET price = ${numericPrice * 100}
+      WHERE id = ${id}::uuid;
+    `;
+
+    revalidatePath('/dashboard/myshop');
+    
+  } catch (error) {
+    console.error('Database Error (editShopMedicine):', error);
+    throw new Error('Failed to update medicine information.');
+  }
+  redirect('/dashboard/myshop');
+}

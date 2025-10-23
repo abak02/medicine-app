@@ -1,7 +1,7 @@
 // import Image from 'next/image';
 // import { UpdateInvoice, DeleteInvoice } from '@/app/ui/invoices/buttons';
 // import InvoiceStatus from '@/app/ui/invoices/status';
-// import { formatDateToLocal, formatCurrency } from '@/app/lib/utils';
+import { formatDateToLocal, formatCurrency } from '@/app/lib/utils';
 import { fetchFilteredMedicine } from '@/app/lib/data';
 
 export default async function MedicineTable({
@@ -40,7 +40,7 @@ export default async function MedicineTable({
                                         <p className="text-green-500">
                                             {medicine.nameofthemanufacturer}
                                         </p>
-                                        <p className='font-medium'>{medicine.price}</p>
+                                        <p className='font-medium'>{formatCurrency(medicine.price)} TK</p>
                                     </div>
                                 </div>
                             </div>
