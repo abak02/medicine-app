@@ -292,7 +292,7 @@ export async function fetchFilteredMedicineWithStockForSuggestion(query) {
       WHERE
         ml.brandname ILIKE ${`${query}%`}  -- Uses idx_medicinelist_brandname
       ORDER BY ml.brandname  -- Uses the same index for sorting
-      LIMIT 10
+      LIMIT 20
     `;
 
     return medicines.rows.map(med => ({
