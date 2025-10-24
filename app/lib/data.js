@@ -273,6 +273,41 @@ export async function fetchFilteredMedicineForSuggestion(
     throw new Error('Failed to fetch medicine list.');
   }
 }
+
+
+
+// Optimized medicine search with stock - now will use indexes
+export async function fetchFilteredMedicineWithStockForSuggestion(query) {
+  noStore();
+  try {
+    const medicines = await sql`
+      SELECT
+        ml.id,
+        ml.brandname,
+        ml.dosagedescription,
+        ml.price,
+        COALESCE(si.quantity, 0) as stock_quantity
+      FROM medicinelist ml
+      LEFT JOIN shopinventory si ON ml.id = si.medicine_id  -- Uses idx_shopinventory_medicine_id
+      WHERE
+        ml.brandname ILIKE ${`${query}%`}  -- Uses idx_medicinelist_brandname
+      ORDER BY ml.brandname  -- Uses the same index for sorting
+      LIMIT 10
+    `;
+
+    return medicines.rows.map(med => ({
+      ...med,
+      price: med.price / 100,
+      stock_quantity: med.stock_quantity || 0,
+    }));
+  } catch (error) {
+    console.error('Database Error:', error);
+    return [];
+  }
+}
+
+
+
 const INVOICES_PER_PAGE = 15;
 export async function fetchInvoicesPages(query) {
   noStore();

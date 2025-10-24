@@ -45,7 +45,7 @@ export default function CreateInvoice() {
     return (
         <form onSubmit={handleSubmit}>
             <div className="rounded-md bg-gray-50 p-4 md:p-6">
-            <p className={`${lusitana.className} text-lg mb-2`}>Customer Details</p>
+            <p className={`${lusitana.className} text-xl mb-2 text-blue-500`}>Customer Details</p>
                 <div className="mb-4">
                     <label htmlFor="customerName" className="mb-2 block text-sm font-medium">
                         Customer Name
