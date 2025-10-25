@@ -600,3 +600,55 @@ export async function fetchShopMedicinesById(id) {
   }
 }
 
+// app/lib/data.js
+export async function fetchManufacturersWithLowStock() {
+  noStore();
+  try {
+    const data = await sql`
+      SELECT 
+        COALESCE(m.nameofthemanufacturer, 'Unknown') as name,
+        COUNT(*) as low_stock_count,
+        SUM(CASE WHEN s.quantity = 0 THEN 1 ELSE 0 END) as out_of_stock_count
+      FROM shopinventory s
+      INNER JOIN medicinelist m ON s.medicine_id = m.id
+      WHERE s.quantity <= 10
+      GROUP BY m.nameofthemanufacturer
+      ORDER BY low_stock_count DESC, name ASC
+      LIMIT 50
+    `;
+    
+    return data.rows;
+  } catch (error) {
+    console.error('Database Error:', error);
+    throw new Error('Failed to fetch manufacturers.');
+  }
+}
+
+export async function fetchLowStockMedicinesByManufacturer(manufacturerName) {
+  noStore();
+  try {
+    const data = await sql`
+      SELECT 
+        m.id as medicine_id,
+        m.brandname,
+        m.genericname,
+        m.dosagedescription,
+        m.nameofthemanufacturer,
+        m.price,
+        s.quantity
+      FROM shopinventory s
+      INNER JOIN medicinelist m ON s.medicine_id = m.id
+      WHERE s.quantity <= 10
+      AND m.nameofthemanufacturer = ${manufacturerName}
+      ORDER BY 
+        s.quantity ASC,
+        m.brandname ASC
+      LIMIT 100
+    `;
+    
+    return data.rows;
+  } catch (error) {
+    console.error('Database Error:', error);
+    throw new Error('Failed to fetch medicines by manufacturer.');
+  }
+}

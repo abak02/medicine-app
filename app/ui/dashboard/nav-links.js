@@ -4,7 +4,8 @@ import {
   HomeIcon,
   DocumentDuplicateIcon,
   ListBulletIcon,
-  BuildingStorefrontIcon
+  BuildingStorefrontIcon,
+  ClipboardDocumentCheckIcon
 } from '@heroicons/react/24/outline';
 
 import Link from 'next/link';
@@ -21,7 +22,9 @@ const links = [
   },
   { name: 'Customers', href: '/dashboard/customers', icon: UserGroupIcon },
   {name: 'My Shop', href: '/dashboard/myshop', icon: BuildingStorefrontIcon },
-  { name: 'Medicine List', href: '/dashboard/medicineList', icon: ListBulletIcon },
+  { name:'Order Lists', href:'/dashboard/orderlists', icon: ClipboardDocumentCheckIcon },
+  { name: 'Medicine List', href: '/dashboard/medicineList', icon: ListBulletIcon }
+  
 ];
 
 export default function NavLinks() {

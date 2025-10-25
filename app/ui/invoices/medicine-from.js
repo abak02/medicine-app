@@ -179,7 +179,7 @@ export default function MedicineForm({ onAddMedicine }) {
               }}
               autoComplete="off"
               value={medicineName}
-              required
+              
             />
           </div>
           {errors.medicineName && (
@@ -227,7 +227,7 @@ export default function MedicineForm({ onAddMedicine }) {
           )}
         </div>
         <div className="relative flex-1">
-          <label htmlFor="quantity" className="mb-2 block text-sm font-medium">
+          <label htmlFor="quantity" className="mb-2 mt-2 block text-sm font-medium">
             Quantity *
           </label>
           <div className="relative">
@@ -253,7 +253,7 @@ export default function MedicineForm({ onAddMedicine }) {
                 }
               }}
               min="1"
-              required
+              
             />
           </div>
           {errors.quantity && (
@@ -261,7 +261,7 @@ export default function MedicineForm({ onAddMedicine }) {
           )}
         </div>
         <div className="relative flex-1">
-          <label htmlFor="price" className="mb-2 block text-sm font-medium">
+          <label htmlFor="price" className="mb-2 mt-2 block text-sm font-medium">
             Price *
           </label>
           <div className="relative">
@@ -286,7 +286,7 @@ export default function MedicineForm({ onAddMedicine }) {
                   ? 'border-red-500 focus:border-red-500' 
                   : 'border-gray-200 focus:border-blue-500'
               }`}
-              required
+              
             />
           </div>
           {errors.price && (

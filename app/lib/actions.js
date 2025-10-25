@@ -51,78 +51,119 @@ export async function createInvoice(formData, selectedMedicines) {
         discountPercentage: formData.get('discount'),
         givenAmount: formData.get('givenAmount')
     });
+    
     console.log(discountPercentage, givenAmount);
     const discountPercentNum = parseFloat(discountPercentage) || 0;
     const givenAmountNum = parseFloat(givenAmount) || 0;
 
-
     const invoiceId = uuidv4();
-    const locale = 'en-US';
-    const options = {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-        hour12: true // Use 12-hour format
-    };
     const date = new Date();
-
-    // Format both date and time together
     const formattedDateTime = date.toISOString();
     let customerId;
 
     try {
         // Check if the customer already exists
         const existingCustomer = await sql`
-          SELECT id FROM customers WHERE phone_no = ${customerEmail}
-      `;
+            SELECT id FROM customers WHERE phone_no = ${customerEmail}
+        `;
 
         if (existingCustomer?.rows[0]?.id) {
-            // Use existing customer ID
-            customerId = existingCustomer?.rows[0]?.id;
-
-        }
-        else {
-            // Insert new customer and get the new customer ID
-
+            customerId = existingCustomer.rows[0].id;
+        } else {
             customerId = uuidv4();
             await sql`
-              INSERT INTO customers (id, name, phone_no)
-              VALUES (${customerId}, ${customerName}, ${customerEmail})
-          `;
+                INSERT INTO customers (id, name, phone_no)
+                VALUES (${customerId}, ${customerName}, ${customerEmail})
+            `;
         }
 
         // Calculate total amount of the invoice
         const total = selectedMedicines.reduce((acc, medicine) => acc + parseFloat(medicine.totalPrice), 0);
         const discountedAmount = Math.round(total * (discountPercentNum / 100));
-
-        // Calculate final amount after discount
         const finalAmount = Math.round(total - discountedAmount);
+
         // Insert invoice details
         await sql`
-      INSERT INTO invoices (id, customer_id, date, amount, status, time, discounted_amount, given_amount)
-      VALUES (${invoiceId}, ${customerId}, ${formattedDateTime}, ${finalAmount * 100}, ${status}, ${formattedDateTime}, ${discountedAmount * 100}, ${givenAmountNum * 100})
-    `;
+            INSERT INTO invoices (id, customer_id, date, amount, status, time, discounted_amount, given_amount)
+            VALUES (${invoiceId}, ${customerId}, ${formattedDateTime}, ${finalAmount * 100}, ${status}, ${formattedDateTime}, ${discountedAmount * 100}, ${givenAmountNum * 100})
+        `;
 
-        // Iterate through selected medicines and insert into invoice_medicines table
+        // Process each medicine in the invoice
         for (const medicine of selectedMedicines) {
-            const { id, quantity, price } = medicine;
-            const pricePerUnit = parseFloat(price.replace(/[^\d.-]/g, ''));
+            const { id, quantity, price, brandname } = medicine;
+            const priceString = price.toString();
+            const pricePerUnit = parseFloat(priceString.replace(/[^\d.-]/g, ''));
+            const priceInCents = Math.round(pricePerUnit * 100);
+            const customerQuantity = quantity;
 
+            // 1. Insert into invoice_medicines table
             await sql`
-              INSERT INTO invoice_medicines (invoice_id, medicine_id, quantity, price_per_unit)
-              VALUES (${invoiceId}, ${id}, ${quantity}, ${pricePerUnit * 100})
-          `;
+                INSERT INTO invoice_medicines (invoice_id, medicine_id, quantity, price_per_unit)
+                VALUES (${invoiceId}, ${id}, ${customerQuantity}, ${priceInCents})
+            `;
+
+            // 2. Update medicine price in medicinelist table if changed
+            const currentMedicine = await sql`
+                SELECT price FROM medicinelist WHERE id = ${id}
+            `;
+
+            if (currentMedicine.rows.length > 0) {
+                const currentPrice = currentMedicine.rows[0].price;
+                
+                // Check if price has changed
+                if (Math.abs(currentPrice - priceInCents) > 1) {
+                    await sql`
+                        UPDATE medicinelist 
+                        SET price = ${priceInCents} 
+                        WHERE id = ${id}
+                    `;
+                    console.log(`Price updated for ${brandname}: ${currentPrice} -> ${priceInCents}`);
+                }
+            }
+
+            // 3. SMART INVENTORY UPDATE
+            const currentInventory = await sql`
+                SELECT quantity FROM shopinventory WHERE medicine_id = ${id}
+            `;
+
+            if (currentInventory.rows.length > 0) {
+                const currentStock = currentInventory.rows[0].quantity;
+                
+                if (currentStock >= customerQuantity) {
+                    // Enough stock - subtract customer quantity
+                    const newStock = currentStock - customerQuantity;
+                    await sql`
+                        UPDATE shopinventory 
+                        SET quantity = ${newStock} 
+                        WHERE medicine_id = ${id}
+                    `;
+                    console.log(`Stock reduced for ${brandname}: ${currentStock} -> ${newStock}`);
+                } else {
+                    // Not enough stock - set to 0 and create invoice for full customer needs
+                    await sql`
+                        UPDATE shopinventory 
+                        SET quantity = 0 
+                        WHERE medicine_id = ${id}
+                    `;
+                    console.log(`Insufficient stock for ${brandname}. Required: ${customerQuantity}, Available: ${currentStock}. Stock set to 0.`);
+                }
+            } else {
+                // No inventory record found - create one with 0 stock
+                await sql`
+                    INSERT INTO shopinventory (medicine_id, quantity)
+                    VALUES (${id}, 0)
+                `;
+                console.log(`Created inventory record for ${brandname} with 0 stock`);
+            }
         }
 
-
     } catch (error) {
+        console.error('Database Error: Failed to Create Invoice.', error);
         return {
             message: 'Database Error: Failed to Create Invoice.'
         };
     }
+
     // Revalidate and redirect
     revalidatePath('/dashboard/invoices');
     redirect('/dashboard/invoices');
